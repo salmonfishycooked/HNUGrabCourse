@@ -11,7 +11,7 @@ from login.loginHNU import loginEA
 
 
 msgCourseFull = "AdTcqNcOwvDoROlqROpvh/f0h+edDiNfk9m94J1XhDJhishB/hnuPH+Pb9wVa5e2"
-msgCoursePicked = "PsIWXMwEVHKbW7y9q4bgVg=="
+msgCourseGrabbed = "PsIWXMwEVHKbW7y9q4bgVg=="
 msgCoursePicked = "AdTcqNcOwvDoROlqROpvh7KcHx2VZXAc7y0F5vzAm+7f44L0qWpsjr0Ff3iwAvSkHIIVJsQkCgdRBPig76vZVupfmjlKps41cq+irsrGzAblV0itXJuwHXWWyimkXpVV"
 
 
@@ -108,12 +108,12 @@ def _takeCourse(courseId, courseName):
                 if response.text == msgCoursePicked:
                     _status[courseName]["state"] = pickedState
                     break
-                if response.text != msgCoursePicked and response.text != msgCourseFull:
+                if response.text != msgCourseGrabbed and response.text != msgCourseFull:
                     _status[courseName]["state"] = exceptionState
                     break
                     # print(f"the course {courseId} doesn't exist, or you have picked the course!")
 
-                success = True if response.text == msgCoursePicked else False
+                success = True if response.text == msgCourseGrabbed else False
                 # print(f"{courseName} Round {i}:", "Got it!" if success else "holo is trying her best to help you grab the course :)")
         except Exception as e:
             pass
