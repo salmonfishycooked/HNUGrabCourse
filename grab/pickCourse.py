@@ -7,6 +7,7 @@ from rich.live import Live
 from rich.table import Table
 
 from config import config
+from grab.decrypt2 import decrypt2
 from login.loginHNU import loginEA
 
 
@@ -31,6 +32,7 @@ _tasks = []
 _status = {}
 _spinner = ["|", "/", "-", "\\"]
 
+
 runningState = "GRABBING"
 finishState = "✔ WE GOT IT"
 exceptionState = "⚠ EXCEPTION"
@@ -53,26 +55,28 @@ def updateUrl():
 
 
 def drawProgressBar():
-    def render_table(frame):
+    def renderTable(frame):
         table = Table()
+        table.add_column("Course ID")
         table.add_column("Course Name")
         table.add_column("Status")
         table.add_column("Tries")
         for task in _tasks:
             state = _status[task]["state"]
             tries = _status[task]["tries"]
+            cname = _status[task]["cname"]
             displayState = f"{_spinner[frame % len(_spinner)]} {state}" if state == runningState else state
-            table.add_row(task, displayState, str(tries))
+            table.add_row(task, cname, displayState, str(tries))
         return table
 
-    with Live(render_table(0), refresh_per_second=3) as live:
+    with Live(renderTable(0), refresh_per_second=3) as live:
         frame = 0
         while any(_status[task]["state"] == runningState for task in _tasks):
             frame += 1
-            live.update(render_table(frame))
+            live.update(renderTable(frame))
             time.sleep(0.33)
         frame += 1
-        live.update(render_table(frame))
+        live.update(renderTable(frame))
 
 
 def pickCourse(courseIds, courseNames):
@@ -86,8 +90,8 @@ def pickCourse(courseIds, courseNames):
 
     for (cid, cname) in zip(courseIds, courseNames):
         nRunningTasks += 1
-        _tasks.append(cname)
-        _status[cname] = {"state": runningState, "tries": 0}
+        _tasks.append(cid)
+        _status[cid] = {"cname": cname, "state": runningState, "tries": 0}
         threading.Thread(target=_takeCourse, args=(cid, cname)).start()
 
     threading.Thread(target=drawProgressBar).start()
@@ -104,23 +108,22 @@ def _takeCourse(courseId, courseName):
         try:
             if not success:
                 response = requests.request("POST", url, headers=headers, data=payload, timeout=5)
-                _status[courseName]["tries"] += 1
+                _status[courseId]["tries"] += 1
                 if response.text == msgCoursePicked:
-                    _status[courseName]["state"] = pickedState
+                    _status[courseId]["state"] = pickedState
                     break
                 if response.text != msgCourseGrabbed and response.text != msgCourseFull:
-                    _status[courseName]["state"] = exceptionState
+                    _status[courseId]["state"] = exceptionState
+                    print(f"> HOLO have caught an grabbing accident of {courseName} ({courseId}): {decrypt2(response.text)}")
                     break
-                    # print(f"the course {courseId} doesn't exist, or you have picked the course!")
 
                 success = True if response.text == msgCourseGrabbed else False
-                # print(f"{courseName} Round {i}:", "Got it!" if success else "holo is trying her best to help you grab the course :)")
         except Exception as e:
             pass
             # print("holo caught an exception, but she will continue trying...")
 
         if success:
-            _status[courseName]["state"] = finishState
+            _status[courseId]["state"] = finishState
             break
 
         time.sleep(config["timeInterval"])
