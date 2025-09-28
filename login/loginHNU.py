@@ -26,11 +26,15 @@ action, executionValue = None, None
 
 
 def encryptRSA(text, publicExponent, modulus):
-    process = subprocess.run(
-        ["node", os.path.join(os.getcwd(), "login", "encryptRSA.js"), text, publicExponent, modulus],
-        capture_output=True,
-        text=True
-    )
+    try:
+        process = subprocess.run(
+            ["node", os.path.join(os.getcwd(), "login", "encryptRSA.js"), text, publicExponent, modulus],
+            capture_output=True,
+            text=True
+        )
+    except Exception as e:
+        print("> HOLO: Make sure you have installed node.js.")
+        exit(1)
 
     return process.stdout
 
@@ -117,6 +121,7 @@ def _doLogin(username, encryptedPwd):
         _syz = response.cookies["_syz"]
     except Exception as e:
         print("> HOLO: Frequent login. Try again later! Now it's coffee time!")
+        exit(1)
 
 
 def _makeNecessaryCookie():
