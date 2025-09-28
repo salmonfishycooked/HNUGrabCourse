@@ -62,6 +62,8 @@ if __name__ == "__main__":
     print("| This program is designed for someone who is a graduate of Hunan University to grab the course.")
     print("| Here is 🐺 HOLO 🐺, the Wise Wolf of Yoitsu.")
     print("| Author: sharkie (https://github.com/salmonfishycooked)")
+    print("| Use HNU WIFI to get a faster experience.")
+    print("| ⚠ BETTER NOT TO USE VPN! ⚠")
     print("-------------------------------------------------------------------------------------------------")
 
     loginHNU()

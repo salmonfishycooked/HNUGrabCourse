@@ -14,7 +14,7 @@ This project is designed for our graduates of Hunan University to pick their cou
 
 ## Environment
 
-- Python 3.9+
+- Python 3.12+
 - Node.js 22+
 
 
